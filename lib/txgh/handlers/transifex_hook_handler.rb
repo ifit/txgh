@@ -1,4 +1,7 @@
+
 require 'logger'
+
+$counter = 0
 
 module Txgh
   module Handlers
@@ -17,6 +20,9 @@ module Txgh
       end
 
       def execute
+        $counter = $counter < 200 ? $counter + 10 : 0
+        sleep($counter)
+
         logger.info(resource_slug)
         # Check if push trigger is set in project config
         if project.push_trigger_set?
