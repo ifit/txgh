@@ -1,9 +1,22 @@
 #!/bin/bash
 
-SSL_KEY="/home/ec2-user/.ssh/key.pem"
-SSL_CERT="/home/ec2-user/.ssh/cert.pem"
 PORT=9292
+LOG_FILE=./out.log
 
-SSL_STARTUP_URI="ssl://0.0.0.0:$PORT?key=$SSL_KEY&cert=$SSL_CERT"
+function tee_logs {
+  echo "$@" | tee -a "${LOG_FILE}"
+}
 
-setsid puma -b "$SSL_STARTUP_URI" &>>out.log &
+tee_logs "Starting txgh"
+setsid bundle exec rackup --host 0.0.0.0 -E production -p ${PORT} &>> out.log &
+
+tee_logs "Checking for nginx config changes"
+NGINX_CHANGES=$(diff ./nginx/ssl.conf /etc/nginx/conf.d/ssl.conf)
+if [[ -n ${NGINX_CHANGES} ]]; then
+  tee_logs "Nginx changed.  Backing up config and copying new config into place."
+  cp /etc/nginx/conf.d/ssl.conf{,.bak}
+  cp ./nginx/ssl.conf /etc/nginx/conf.d/ssl.conf
+fi
+
+tee_logs "Reloading nginx"
+nginx -s reload
