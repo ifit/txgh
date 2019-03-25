@@ -1,5 +1,4 @@
 /config/*
-Gemfile.lock
 *.rbc
 *.sassc
 .sass-cache
