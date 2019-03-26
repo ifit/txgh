@@ -7,7 +7,6 @@ config/txgh_config.rb
 /db/*.sqlite3
 .DS_Store
 .env
-Gemfile.lock
 /log/*
 **.orig
 out.log
