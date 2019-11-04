@@ -19,4 +19,4 @@ if [[ -n ${NGINX_CHANGES} ]]; then
 fi
 
 tee_logs "Reloading nginx"
-nginx -s reload
+docker exec ec2-user_nginx_1 /bin/bash -c "nginx -s reload"
